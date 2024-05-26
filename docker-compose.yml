@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+    mongodb:
+        image: mongo
+        networks:
+          - mern_network
+        volumes:
+            - mongodb_data:/data/db
+        ports:
+            - "27017:27017"
+    
+
+    express:
+        build: ./backend
+        networks:
+          - mern_network
+        ports:
+          - "5000:5000"
+        volumes:
+          - ./backend:/usr/src/app
+          - /usr/src/app/node_modules
+        depends_on:
+            - mongodb
+    
+
+    react:
+        build: ./frontend
+        networks:
+          - mern_network
+        ports:
+          - "3000:3000"
+        volumes:
+          - ./frontend:/usr/src/app
+          - /usr/src/app/node_modules
+        depends_on:
+            - express
+    
+    nginx:
+        image: nginx:latest
+        networks:
+          - mern_network
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - ./nginx:/etc/nginx/conf.d
+        depends_on:
+          - react
+
+volumes:
+  mongodb_data:
+networks:
+  mern_network:
