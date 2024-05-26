@@ -44,7 +44,7 @@ services:
           - "80:80"
           - "443:443"
         volumes:
-          - ./nginx:/etc/nginx/conf.d
+          - ./mern.conf:/etc/nginx/conf.d
         depends_on:
           - react
 
