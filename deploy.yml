@@ -18,10 +18,15 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Copy files to server
+    - name: Copy Docker Compose files to server
       run: |
-        scp -r -o StrictHostKeyChecking=no . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/path/to/your/deployment/directory
+        scp -r -o StrictHostKeyChecking=no docker-compose.yml backend frontend nginx ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/path/to/deployment/directory
 
-    - name: Execute deployment script on server
+    - name: Deploy Docker Compose
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cd /path/to/your/deployment/directory && ./deploy.sh"
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+          cd /path/to/deployment/directory &&
+          docker-compose down &&
+          docker-compose pull &&
+          docker-compose up -d --build
+        "
